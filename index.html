@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Result Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --surface2: #f0f4f8;
+      --border: #d6dfe8;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #dbeafe;
+      --green: #059669;
+      --green-dark: #047857;
+      --green-light: #d1fae5;
+      --orange: #d97706;
+      --orange-light: #fef3c7;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --text: #0f172a;
+      --text-mid: #374151;
+      --text-muted: #6b7280;
+      --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+      --font: 'Plus Jakarta Sans', sans-serif;
+      --radius: 14px;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #0369a1 100%);
+      padding: 0 2.5rem;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(37,99,235,0.3);
+    }
+
+    .logo { display: flex; align-items: center; gap: 0.85rem; }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.2);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .logo-text h1 {
+      font-size: 1rem; font-weight: 800;
+      color: white; letter-spacing: -0.01em; line-height: 1.2;
+    }
+
+    .logo-text span { font-size: 0.72rem; color: rgba(255,255,255,0.7); font-weight: 400; }
+
+    .live-pill {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; font-weight: 700;
+      color: #6ee7b7;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(110,231,183,0.4);
+      border-radius: 20px; padding: 0.3rem 0.8rem;
+      letter-spacing: 0.04em;
+    }
+
+    .live-dot { width: 6px; height: 6px; background: #34d399; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── TABS ── */
+    .tabs {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+      padding: 0 2.5rem;
+      display: flex; gap: 0;
+      overflow-x: auto;
+      box-shadow: var(--shadow);
+    }
+
+    .tab {
+      padding: 0.9rem 1.3rem;
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer; border: none; background: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s;
+      white-space: nowrap;
+      font-family: var(--font);
+    }
+
+    .tab:hover { color: var(--text); background: var(--surface2); }
+    .tab.active { color: var(--blue); border-bottom-color: var(--blue); background: var(--blue-light); }
+
+    /* ── MAIN ── */
+    main { max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── PAGE TITLE ── */
+    .page-title { margin-bottom: 1.5rem; }
+
+    .page-title h2 {
+      font-size: 1.45rem; font-weight: 800;
+      color: var(--text); letter-spacing: -0.02em; margin-bottom: 0.2rem;
+    }
+
+    .page-title p { font-size: 0.875rem; color: var(--text-muted); }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--text-mid); margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    .bar-blue  { width: 3px; height: 14px; background: var(--blue);  border-radius: 2px; }
+    .bar-green { width: 3px; height: 14px; background: var(--green); border-radius: 2px; }
+
+    /* ── FORM ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--text-mid); letter-spacing: 0.02em;
+    }
+
+    input, select {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      color: var(--text);
+      font-family: var(--font); font-size: 0.875rem;
+      outline: none; transition: all 0.15s; width: 100%;
+    }
+
+    input::placeholder { color: #9ca3af; }
+
+    input:focus, select:focus {
+      border-color: var(--blue);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 0.65rem 1.3rem;
+      border-radius: 8px;
+      font-family: var(--font); font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; border: none;
+      transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+
+    .btn-blue {
+      background: var(--blue); color: white;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.35);
+    }
+    .btn-blue:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,0.4); }
+
+    .btn-green {
+      background: var(--green); color: white;
+      box-shadow: 0 2px 6px rgba(5,150,105,0.3);
+    }
+    .btn-green:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(5,150,105,0.35); }
+
+    .btn-outline {
+      background: white; color: var(--text-mid);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+    .btn-row { display: flex; gap: 0.6rem; margin-top: 1.1rem; flex-wrap: wrap; }
+
+    /* ── SECTION HEADER COLORS ── */
+    .section-blue  { border-left: 4px solid var(--blue);  background: var(--blue-light);  border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin-bottom: 1.25rem; }
+    .section-green { border-left: 4px solid var(--green); background: var(--green-light); border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin-bottom: 1.25rem; }
+
+    .section-blue h3  { font-size: 0.85rem; font-weight: 700; color: var(--blue);  margin-bottom: 0.1rem; }
+    .section-green h3 { font-size: 0.85rem; font-weight: 700; color: var(--green); margin-bottom: 0.1rem; }
+    .section-blue p, .section-green p { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+    thead { background: linear-gradient(135deg, #eff6ff, #f0fdf4); }
+
+    th {
+      text-align: left; padding: 0.7rem 1rem;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-mid);
+      border-bottom: 2px solid var(--border);
+    }
+
+    td { padding: 0.85rem 1rem; border-bottom: 1px solid #f0f4f8; color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fbff; }
+
+    /* ── CHIPS ── */
+    .chip {
+      display: inline-block;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 5px; padding: 0.15rem 0.55rem;
+      font-size: 0.78rem; font-weight: 600; color: var(--text-mid);
+      font-family: monospace;
+    }
+
+    .chip-blue   { background: var(--blue-light);   color: var(--blue);   border-color: #93c5fd; }
+    .chip-green  { background: var(--green-light);  color: var(--green);  border-color: #6ee7b7; }
+    .chip-orange { background: var(--orange-light); color: var(--orange); border-color: #fcd34d; }
+
+    /* ── GRADE ── */
+    .grade {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 8px;
+      font-size: 0.75rem; font-weight: 800;
+    }
+
+    .g-O  { background: var(--green-light);  color: var(--green);  border: 1.5px solid #6ee7b7; }
+    .g-Ap { background: var(--blue-light);   color: var(--blue);   border: 1.5px solid #93c5fd; }
+    .g-A  { background: var(--purple-light); color: var(--purple); border: 1.5px solid #c4b5fd; }
+    .g-Bp { background: var(--orange-light); color: var(--orange); border: 1.5px solid #fcd34d; }
+    .g-B  { background: #fff7ed; color: #ea580c; border: 1.5px solid #fdba74; }
+    .g-C  { background: #f8fafc; color: #64748b; border: 1.5px solid #cbd5e1; }
+    .g-F  { background: var(--red-light);    color: var(--red);    border: 1.5px solid #fca5a5; }
+
+    /* ── PCT BAR ── */
+    .pct-wrap { display: flex; align-items: center; gap: 0.6rem; }
+    .pct-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .pct-fill  { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--blue), var(--green)); transition: width 0.6s ease; }
+    .pct-val   { font-size: 0.8rem; font-weight: 700; color: var(--green-dark); min-width: 44px; text-align: right; }
+
+    /* ── STATS ── */
+    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1.25rem; }
+
+    .stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.1rem 1.25rem;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+
+    .stat::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+
+    .stat-blue::before  { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+    .stat-green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+    .stat-orange::before{ background: linear-gradient(90deg, var(--orange), #fbbf24); }
+
+    .stat-val { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; margin-bottom: 0.25rem; }
+    .stat-blue  .stat-val  { color: var(--blue); }
+    .stat-green .stat-val  { color: var(--green); }
+    .stat-orange .stat-val { color: var(--orange); }
+    .stat-lbl { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── TOAST ── */
+    #toasts { position: fixed; top: 1rem; right: 1rem; z-index: 999; display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .toast {
+      padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.85rem; font-weight: 500;
+      max-width: 340px; display: flex; align-items: flex-start; gap: 0.5rem;
+      animation: toastIn 0.25s ease; box-shadow: var(--shadow-md);
+    }
+
+    .toast.success { background: var(--green-light); border: 1px solid #6ee7b7; color: #065f46; }
+    .toast.error   { background: var(--red-light);   border: 1px solid #fca5a5; color: #991b1b; }
+    .toast.info    { background: var(--blue-light);  border: 1px solid #93c5fd; color: #1e40af; }
+
+    @keyframes toastIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
+
+    /* ── EMPTY ── */
+    .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); }
+    .empty .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .empty p { font-size: 0.875rem; }
+
+    /* ── SPINNER ── */
+    .spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spinning 0.6s linear infinite; display: inline-block; }
+    .spin-color { border-color: rgba(37,99,235,0.2); border-top-color: var(--blue); }
+    @keyframes spinning { to{transform:rotate(360deg)} }
+
+    @media (max-width: 600px) {
+      header { padding: 0 1rem; }
+      .tabs  { padding: 0 1rem; }
+      main   { padding: 1.25rem 1rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr; }
+      .logo-text h1 { font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="toasts"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎓</div>
+    <div class="logo-text">
+      <h1>Student Result Management System</h1>
+      <span>GHRCE, Nagpur — Information Technology</span>
+    </div>
+  </div>
+  <div class="live-pill"><span class="live-dot"></span> LIVE</div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" onclick="switchTab('students',this)">👨‍🎓 Students</button>
+  <button class="tab" onclick="switchTab('subjects',this)">📚 Subjects</button>
+  <button class="tab" onclick="switchTab('results',this)">➕ Add Result</button>
+  <button class="tab" onclick="switchTab('view',this)">🔍 View Results</button>
+</nav>
+
+<main>
+
+  <!-- STUDENTS -->
+  <section id="tab-students" class="section active">
+    <div class="page-title">
+      <h2>Student Management</h2>
+      <p>Register new students and view the complete student list</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="bar-blue"></span> Register New Student</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name</label>
+          <input id="s-fname" type="text" placeholder="e.g. Mohit" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input id="s-lname" type="text" placeholder="e.g. Morande" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input id="s-email" type="email" placeholder="mohit@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input id="s-roll" type="text" placeholder="e.g. IT2023001" />
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <input id="s-dept" type="text" placeholder="e.g. Information Technology" />
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <select id="s-sem">
+            <option value="">Select Semester</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+            <option>5</option><option>6</option><option>7</option><option>8</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-blue" onclick="addStudent()">Register Student</button>
+        <button class="btn btn-outline" onclick="loadStudents()">↺ Refresh List</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="bar-green"></span> All Students</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Full Name</th><th>Roll No.</th><th>Department</th><th>Semester</th></tr>
+          </thead>
+          <tbody id="students-tbody">
+            <tr><td colspan="5"><div class="empty"><div class="icon">👨‍🎓</div><p>Click "Refresh List" to load students</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBJECTS -->
+  <section id="tab-subjects" class="section">
+    <div class="page-title">
+      <h2>Subject Management</h2>
+      <p>Add subjects and manage the curriculum</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="bar-blue"></span> Add New Subject</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Subject Name</label>
+          <input id="sub-name" type="text" placeholder="e.g. Data Structures and Algorithms" />
+        </div>
+        <div class="form-group">
+          <label>Subject Code</label>
+          <input id="sub-code" type="text" placeholder="e.g. IT301" />
+        </div>
+        <div class="form-group">
+          <label>Maximum Marks</label>
+          <input id="sub-marks" type="number" placeholder="e.g. 100" min="1" />
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <select id="sub-sem">
+            <option value="">Select Semester</option>
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+            <option>5</option><option>6</option><option>7</option><option>8</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Department</label>
+          <input id="sub-dept" type="text" placeholder="e.g. Information Technology" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-blue" onclick="addSubject()">Add Subject</button>
+        <button class="btn btn-outline" onclick="loadSubjects()">↺ Refresh List</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="bar-green"></span> All Subjects</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Subject Name</th><th>Code</th><th>Max Marks</th><th>Semester</th></tr>
+          </thead>
+          <tbody id="subjects-tbody">
+            <tr><td colspan="5"><div class="empty"><div class="icon">📚</div><p>Click "Refresh List" to load subjects</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD RESULT -->
+  <section id="tab-results" class="section">
+    <div class="page-title">
+      <h2>Add Result</h2>
+      <p>Enter marks — grade and percentage are calculated automatically by the server</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="bar-blue"></span> Enter Marks</div>
+      <div class="section-blue">
+        <h3>💡 Tip</h3>
+        <p>Go to Students tab and note the Student ID, then go to Subjects tab for Subject ID before adding a result.</p>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Student ID</label>
+          <input id="r-sid" type="number" placeholder="e.g. 1" min="1" />
+        </div>
+        <div class="form-group">
+          <label>Subject ID</label>
+          <input id="r-subid" type="number" placeholder="e.g. 1" min="1" />
+        </div>
+        <div class="form-group full">
+          <label>Marks Obtained</label>
+          <input id="r-marks" type="number" placeholder="Enter marks obtained" min="0" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="addResult()">✓ Submit Result</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="bar-green"></span> Grading System Reference</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Percentage</th><th>Grade</th><th>Remarks</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-green">≥ 90%</span></td><td><span class="grade g-O">O</span></td><td>Outstanding</td></tr>
+            <tr><td><span class="chip chip-blue">≥ 80%</span></td><td><span class="grade g-Ap">A+</span></td><td>Excellent</td></tr>
+            <tr><td><span class="chip chip-blue">≥ 70%</span></td><td><span class="grade g-A">A</span></td><td>Very Good</td></tr>
+            <tr><td><span class="chip chip-orange">≥ 60%</span></td><td><span class="grade g-Bp">B+</span></td><td>Good</td></tr>
+            <tr><td><span class="chip chip-orange">≥ 50%</span></td><td><span class="grade g-B">B</span></td><td>Average</td></tr>
+            <tr><td><span class="chip">≥ 40%</span></td><td><span class="grade g-C">C</span></td><td>Pass</td></tr>
+            <tr><td><span class="chip">< 40%</span></td><td><span class="grade g-F">F</span></td><td>Fail</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW RESULTS -->
+  <section id="tab-view" class="section">
+    <div class="page-title">
+      <h2>View Results</h2>
+      <p>Enter a Student ID to view their complete result sheet with grades and percentages</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="bar-blue"></span> Search by Student ID</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Student ID</label>
+          <input id="v-sid" type="number" placeholder="e.g. 1" min="1"
+                 onkeydown="if(event.key==='Enter') viewResults()" />
+        </div>
+        <div class="form-group" style="justify-content:flex-end;padding-top:1.4rem">
+          <button class="btn btn-blue" onclick="viewResults()" style="width:100%">Search Results</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="stats-row" class="stats-row" style="display:none">
+      <div class="stat stat-blue">
+        <div class="stat-val" id="stat-sub">—</div>
+        <div class="stat-lbl">Total Subjects</div>
+      </div>
+      <div class="stat stat-green">
+        <div class="stat-val" id="stat-avg">—</div>
+        <div class="stat-lbl">Average %</div>
+      </div>
+      <div class="stat stat-orange">
+        <div class="stat-val" id="stat-top">—</div>
+        <div class="stat-lbl">Best Grade</div>
+      </div>
+    </div>
+
+    <div class="card" id="result-card" style="display:none">
+      <div class="card-title">
+        <span class="bar-green"></span>
+        Result Sheet —
+        <span id="result-name" style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--blue)"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Subject</th><th>Code</th><th>Marks</th><th>Percentage</th><th>Grade</th><th>Remarks</th></tr>
+          </thead>
+          <tbody id="results-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const API = 'https://student-result-system-b8z0.onrender.com';
+
+  function toast(msg, type='info') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    const icons = {success:'✓', error:'✕', info:'i'};
+    el.innerHTML = `<strong>${icons[type]}</strong><span>${msg}</span>`;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  function switchTab(name, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  async function req(method, path, body) {
+    try {
+      const res = await fetch(`${API}${path}`, {
+        method,
+        headers: {'Content-Type':'application/json'},
+        body: body ? JSON.stringify(body) : undefined
+      });
+      return await res.json();
+    } catch {
+      toast('Network error — API may be waking up. Try again in 30 seconds.', 'error');
+      return null;
+    }
+  }
+
+  function gc(g) {
+    return {'O':'g-O','A+':'g-Ap','A':'g-A','B+':'g-Bp','B':'g-B','C':'g-C','F':'g-F'}[g] || '';
+  }
+
+  async function addStudent() {
+    const btn = event.target;
+    const fname = document.getElementById('s-fname').value.trim();
+    const lname = document.getElementById('s-lname').value.trim();
+    const email = document.getElementById('s-email').value.trim();
+    const roll  = document.getElementById('s-roll').value.trim();
+    const dept  = document.getElementById('s-dept').value.trim();
+    const sem   = document.getElementById('s-sem').value;
+    if (!fname||!lname||!email||!roll||!dept||!sem) { toast('Please fill in all fields','error'); return; }
+    btn.disabled=true; btn.innerHTML='<span class="spin"></span> Registering...';
+    const res = await req('POST','/api/students',{firstName:fname,lastName:lname,email,rollNumber:roll,department:dept,semester:+sem});
+    btn.disabled=false; btn.innerHTML='Register Student';
+    if (res?.success) {
+      toast(`Student registered! ID: ${res.data.id}`,'success');
+      ['s-fname','s-lname','s-email','s-roll','s-dept'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('s-sem').value='';
+      loadStudents();
+    } else toast(res?.message||'Failed to register student','error');
+  }
+
+  async function loadStudents() {
+    const tb = document.getElementById('students-tbody');
+    tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:2rem"><span class="spin spin-color"></span></td></tr>`;
+    const res = await req('GET','/api/students');
+    if (!res?.success||!res.data.length) {
+      tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="icon">👨‍🎓</div><p>No students registered yet</p></div></td></tr>`;
+      return;
+    }
+    tb.innerHTML = res.data.map(s=>`
+      <tr>
+        <td><span class="chip chip-blue">#${s.id}</span></td>
+        <td><strong>${s.firstName} ${s.lastName}</strong></td>
+        <td><span class="chip">${s.rollNumber}</span></td>
+        <td>${s.department}</td>
+        <td><span class="chip chip-green">Sem ${s.semester}</span></td>
+      </tr>`).join('');
+  }
+
+  async function addSubject() {
+    const btn = event.target;
+    const name =document.getElementById('sub-name').value.trim();
+    const code =document.getElementById('sub-code').value.trim();
+    const marks=document.getElementById('sub-marks').value;
+    const sem  =document.getElementById('sub-sem').value;
+    const dept =document.getElementById('sub-dept').value.trim();
+    if (!name||!code||!marks||!sem||!dept) { toast('Please fill in all fields','error'); return; }
+    btn.disabled=true; btn.innerHTML='<span class="spin"></span> Adding...';
+    const res = await req('POST','/api/subjects',{name,subjectCode:code,maxMarks:+marks,semester:+sem,department:dept});
+    btn.disabled=false; btn.innerHTML='Add Subject';
+    if (res?.success) {
+      toast(`Subject added! ID: ${res.data.id}`,'success');
+      ['sub-name','sub-code','sub-marks','sub-dept'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('sub-sem').value='';
+      loadSubjects();
+    } else toast(res?.message||'Failed to add subject','error');
+  }
+
+  async function loadSubjects() {
+    const tb = document.getElementById('subjects-tbody');
+    tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:2rem"><span class="spin spin-color"></span></td></tr>`;
+    const res = await req('GET','/api/subjects');
+    if (!res?.success||!res.data.length) {
+      tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="icon">📚</div><p>No subjects added yet</p></div></td></tr>`;
+      return;
+    }
+    tb.innerHTML = res.data.map(s=>`
+      <tr>
+        <td><span class="chip chip-blue">#${s.id}</span></td>
+        <td><strong>${s.name}</strong></td>
+        <td><span class="chip">${s.subjectCode}</span></td>
+        <td>${s.maxMarks}</td>
+        <td><span class="chip chip-green">Sem ${s.semester}</span></td>
+      </tr>`).join('');
+  }
+
+  async function addResult() {
+    const btn = event.target;
+    const sid  =document.getElementById('r-sid').value;
+    const subid=document.getElementById('r-subid').value;
+    const marks=document.getElementById('r-marks').value;
+    if (!sid||!subid||marks==='') { toast('Please fill in all fields','error'); return; }
+    btn.disabled=true; btn.innerHTML='<span class="spin"></span> Submitting...';
+    const res = await req('POST','/api/results',{studentId:+sid,subjectId:+subid,marksObtained:+marks});
+    btn.disabled=false; btn.innerHTML='✓ Submit Result';
+    if (res?.success) {
+      const d=res.data;
+      toast(`Result saved — ${d.subjectName}: ${d.grade} (${d.percentage}%)`,'success');
+      ['r-sid','r-subid','r-marks'].forEach(id=>document.getElementById(id).value='');
+    } else toast(res?.message||'Failed to submit result','error');
+  }
+
+  async function viewResults() {
+    const sid=document.getElementById('v-sid').value;
+    if (!sid) { toast('Please enter a Student ID','error'); return; }
+    const [rRes,aRes] = await Promise.all([
+      req('GET',`/api/results/student/${sid}`),
+      req('GET',`/api/results/student/${sid}/average`)
+    ]);
+    if (!rRes?.success||!rRes.data.length) {
+      toast(rRes?.message||'No results found','error');
+      document.getElementById('stats-row').style.display='none';
+      document.getElementById('result-card').style.display='none';
+      return;
+    }
+    const results=rRes.data;
+    document.getElementById('stats-row').style.display='grid';
+    document.getElementById('stat-sub').textContent=results.length;
+    document.getElementById('stat-avg').textContent=aRes?.data?`${aRes.data}%`:'—';
+    document.getElementById('stat-top').textContent=results.sort((a,b)=>b.percentage-a.percentage)[0]?.grade||'—';
+    document.getElementById('result-name').textContent=results[0]?.studentName||`Student #${sid}`;
+    document.getElementById('result-card').style.display='block';
+    document.getElementById('results-tbody').innerHTML=results.map(r=>`
+      <tr>
+        <td><strong>${r.subjectName}</strong></td>
+        <td><span class="chip">${r.subjectCode}</span></td>
+        <td>${r.marksObtained} / ${r.maxMarks}</td>
+        <td>
+          <div class="pct-wrap">
+            <div class="pct-track"><div class="pct-fill" style="width:${r.percentage}%"></div></div>
+            <span class="pct-val">${r.percentage}%</span>
+          </div>
+        </td>
+        <td><span class="grade ${gc(r.grade)}">${r.grade}</span></td>
+        <td style="color:var(--text-muted);font-size:0.82rem">${r.remarks}</td>
+      </tr>`).join('');
+    toast(`Loaded ${results.length} result(s) for ${results[0]?.studentName}`,'success');
+  }
+</script>
+</body>
+</html>
