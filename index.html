@@ -411,7 +411,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>ID</th><th>Full Name</th><th>Roll No.</th><th>Department</th><th>Semester</th><th>Action</th></tr>
+            <tr><th>#</th><th>ID</th><th>Full Name</th><th>Roll No.</th><th>Department</th><th>Semester</th><th>Action</th></tr>
           </thead>
           <tbody id="students-tbody">
             <tr><td colspan="5"><div class="empty"><div class="icon">👨‍🎓</div><p>Click "Refresh List" to load students</p></div></td></tr>
@@ -467,7 +467,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>ID</th><th>Subject Name</th><th>Code</th><th>Max Marks</th><th>Semester</th><th>Action</th></tr>
+            <tr><th>#</th><th>ID</th><th>Subject Name</th><th>Code</th><th>Max Marks</th><th>Semester</th><th>Action</th></tr>
           </thead>
           <tbody id="subjects-tbody">
             <tr><td colspan="5"><div class="empty"><div class="icon">📚</div><p>Click "Refresh List" to load subjects</p></div></td></tr>
@@ -648,8 +648,9 @@
       tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="icon">👨‍🎓</div><p>No students registered yet</p></div></td></tr>`;
       return;
     }
-    tb.innerHTML = res.data.map(s=>`
+    tb.innerHTML = res.data.map((s, index)=>`
       <tr>
+        <td style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${index + 1}</td>
         <td><span class="chip chip-blue">#${s.id}</span></td>
         <td><strong>${s.firstName} ${s.lastName}</strong></td>
         <td><span class="chip">${s.rollNumber}</span></td>
@@ -686,8 +687,9 @@
       tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="icon">📚</div><p>No subjects added yet</p></div></td></tr>`;
       return;
     }
-    tb.innerHTML = res.data.map(s=>`
+    tb.innerHTML = res.data.map((s, index)=>`
       <tr>
+        <td style="color:var(--text-muted);font-weight:600;font-size:0.82rem">${index + 1}</td>
         <td><span class="chip chip-blue">#${s.id}</span></td>
         <td><strong>${s.name}</strong></td>
         <td><span class="chip">${s.subjectCode}</span></td>
