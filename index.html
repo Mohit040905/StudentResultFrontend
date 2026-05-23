@@ -319,6 +319,23 @@
       .stats-row { grid-template-columns: 1fr; }
       .logo-text h1 { font-size: 0.82rem; }
     }
+    .btn-del {
+      padding: 0.3rem 0.7rem;
+      background: var(--red-light);
+      color: var(--red);
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .btn-del:hover {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+    }
   </style>
 </head>
 <body>
@@ -394,7 +411,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>ID</th><th>Full Name</th><th>Roll No.</th><th>Department</th><th>Semester</th></tr>
+            <tr><th>ID</th><th>Full Name</th><th>Roll No.</th><th>Department</th><th>Semester</th><th>Action</th></tr>
           </thead>
           <tbody id="students-tbody">
             <tr><td colspan="5"><div class="empty"><div class="icon">👨‍🎓</div><p>Click "Refresh List" to load students</p></div></td></tr>
@@ -450,7 +467,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>ID</th><th>Subject Name</th><th>Code</th><th>Max Marks</th><th>Semester</th></tr>
+            <tr><th>ID</th><th>Subject Name</th><th>Code</th><th>Max Marks</th><th>Semester</th><th>Action</th></tr>
           </thead>
           <tbody id="subjects-tbody">
             <tr><td colspan="5"><div class="empty"><div class="icon">📚</div><p>Click "Refresh List" to load subjects</p></div></td></tr>
@@ -638,6 +655,7 @@
         <td><span class="chip">${s.rollNumber}</span></td>
         <td>${s.department}</td>
         <td><span class="chip chip-green">Sem ${s.semester}</span></td>
+        <td><button class="btn-del" onclick="deleteStudent(${s.id}, '${s.firstName} ${s.lastName}')">🗑 Delete</button></td>
       </tr>`).join('');
   }
 
@@ -675,6 +693,7 @@
         <td><span class="chip">${s.subjectCode}</span></td>
         <td>${s.maxMarks}</td>
         <td><span class="chip chip-green">Sem ${s.semester}</span></td>
+        <td><button class="btn-del" onclick="deleteSubject(${s.id}, '${s.name}')">🗑 Delete</button></td>
       </tr>`).join('');
   }
 
@@ -729,6 +748,23 @@
         <td style="color:var(--text-muted);font-size:0.82rem">${r.remarks}</td>
       </tr>`).join('');
     toast(`Loaded ${results.length} result(s) for ${results[0]?.studentName}`,'success');
+  }
+  async function deleteStudent(id, name) {
+    if (!confirm(`Delete student "${name}"?\n\nThis will also delete all their results.`)) return;
+    const res = await req('DELETE', `/api/students/${id}`);
+    if (res?.success) {
+      toast(`Student "${name}" deleted successfully`, 'success');
+      loadStudents();
+    } else toast(res?.message || 'Failed to delete student', 'error');
+  }
+
+  async function deleteSubject(id, name) {
+    if (!confirm(`Delete subject "${name}"?\n\nMake sure no results are linked to this subject.`)) return;
+    const res = await req('DELETE', `/api/subjects/${id}`);
+    if (res?.success) {
+      toast(`Subject "${name}" deleted successfully`, 'success');
+      loadSubjects();
+    } else toast(res?.message || 'Failed to delete subject', 'error');
   }
 </script>
 </body>
